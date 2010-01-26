@@ -110,11 +110,12 @@ class Plurals extends Specification {
       Bootstrap.defineInflections_!
     }
     doAfter {
-      Inflector.inflections().clear
+      Inflector.configure { inf => inf.clear }
     }
     "pass" in {
+      import Inflector._
       plurals.foreach { case (s,p) => 
-        val r = Inflector.pluralize(s)
+        val r = s.pluralize
         r must beEqual(p)
       }
     }

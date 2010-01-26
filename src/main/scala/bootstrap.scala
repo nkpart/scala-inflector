@@ -6,7 +6,7 @@ object Bootstrap {
   implicit def regexToRule(r: Regex) = Rule.r(r)
   
   def defineInflections_! = { 
-  Inflector.inflections(inflect => {
+  Inflector.configure(inflect => {
     inflect.plural("$".r, "s")
     inflect.plural("(?i)s$".r, "s")
     inflect.plural("(?i)(ax|test)is$".r, "$1es")
@@ -24,7 +24,7 @@ object Bootstrap {
     inflect.plural("(?i)([m|l])ouse$".r, "$1ice")
     inflect.plural("(?i)^(ox)$".r, "$1en")
     inflect.plural("(?i)(quiz)$".r, "$1zes")
-    // 
+
     // inflect.singular(/s$/i, '')
     // inflect.singular(/(n)ews$/i, '\1ews')
     // inflect.singular(/([ti])a$/i, '\1um')

@@ -64,30 +64,21 @@ class Inflections {
   }
   
   // TODO: scoping
-  def clear { //(scope = :all) {
-//    case scope
-//      when :all
-        List(plurals, singulars, uncountables) foreach (_.clear)
-    //   else
-    //     instance_variable_set "@#{scope}", []
-    // end
+  def clear {
+    List(plurals, singulars, uncountables) foreach (_.clear)
   }
 }
 
-object Inflector {
-  private lazy val instance = new Inflections
-  def inflections(f: (Inflections => Unit) = (_ => ())) = {
-    f(instance)
-    instance
-  }
+trait InflectorString {
+  val word: String
   
-  def pluralize(word: String): String = {
-    if (word.isEmpty || inflections().uncountables.contains(word.toLowerCase)) {
+  def pluralize(implicit inflections: Inflections): String = {
+    if (word.isEmpty || inflections.uncountables.contains(word.toLowerCase)) {
       word
     } else {
       var result = word
       breakable {
-        inflections().plurals.foreach { case (rule, replacement) => 
+        inflections.plurals.foreach { case (rule, replacement) => 
           if (rule.fold(s => result contains s, r => r findFirstIn result isDefined)) {
             result = rule.fold(s => result replaceAll (s, replacement), r => r replaceAllIn (result, replacement))
             break
@@ -96,5 +87,19 @@ object Inflector {
       }
       result
     }
+  }
+}
+
+object Inflector {
+  private lazy val instance = new Inflections
+  
+  implicit def inflections: Inflections = instance
+  
+  implicit def stringAdditionsTo(s: String) = new InflectorString { val word = s }
+  implicit def stringAdditionsFrom(is: InflectorString) = is.word
+  
+  def configure(f: (Inflections => Unit)) = {
+    f(instance)
+    instance
   }
 }
